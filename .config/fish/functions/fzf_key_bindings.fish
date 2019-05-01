@@ -1,0 +1,1 @@
+/home/ros/.fzf/shell/key-bindings.fish
