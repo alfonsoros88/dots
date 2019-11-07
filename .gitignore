@@ -1,3 +1,7 @@
 *
+!.xinitrc
 !.gitignore
-!.config
+!.xmonad/xmonad.hs
+!.config/nvim
+!.config/fish
+!.local/share/fonts

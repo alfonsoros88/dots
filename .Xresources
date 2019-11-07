@@ -1,7 +1,12 @@
-URxvt.font: xft:SauceCodePro Nerd Font Mono:style=Regular:size=12
+URxvt.termName: screen-256color
 URxvt.scrollBar: false
+URxvt.font: xft:SauceCode Pro Nerd Font Mono:style=Regular:pixelsize=18
 URxvt.iso14755: false
 URxvt.iso14755_52: false
+URxvt.depth: 32
+
+URxvt.keysym.Shift-Control-C: perl:clipboard:copy
+URxvt.keysym.Shift-Control-V: perl:clipboard:paste
 
 ! -----------------------------------------------------------------------------
 ! File: gruvbox-dark.xresources
@@ -39,3 +44,4 @@ URxvt.iso14755_52: false
 ! LightGrey + White
 *color7:  #a89984
 *color15: #ebdbb2
+

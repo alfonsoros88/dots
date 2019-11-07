@@ -1,3 +1,12 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =1
-let g:netrw_dirhist_1='/home/ros/.tmux'
+let g:netrw_dirhistcnt =2
+let g:netrw_dirhist_2='/home/rosdosal/werkstatt/platform/fusion/plugins/dds_v2'
+let g:netrw_dirhist_1='/home/rosdosal/werkstatt/platform/fusion/plugins/dds_v2/src'
+let g:netrw_dirhist_0='/home/rosdosal/werkstatt/platform/fusion/plugins/dds_v2'
+let g:netrw_dirhist_9='/home/rosdosal/werkstatt/platform/fusion/plugins/dds_v2/src'
+let g:netrw_dirhist_8='/home/rosdosal/werkstatt/platform/fusion/include/fusion/io'
+let g:netrw_dirhist_7='/home/rosdosal/werkstatt/platform/fusion/include/fusion/io/details'
+let g:netrw_dirhist_6='/home/rosdosal/werkstatt/platform/fusion/include/fusion/io'
+let g:netrw_dirhist_5='/home/rosdosal/werkstatt/platform/fusion/include/fusion/io/details'
+let g:netrw_dirhist_4='/home/rosdosal/werkstatt/platform/fusion'
+let g:netrw_dirhist_3='/home/rosdosal/werkstatt/platform/fusion/include'
