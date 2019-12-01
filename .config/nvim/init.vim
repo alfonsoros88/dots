@@ -6,17 +6,21 @@ let g:dispatch_no_maps = 1
 let g:nvimgdb_disable_start_keymaps = 1
 
 Plug 'tpope/vim-sensible'
-Plug 'tpope/vim-vinegar'
+" Plug 'tpope/vim-vinegar'
 Plug 'tpope/vim-dispatch'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-obsession'
+Plug 'tpope/vim-eunuch'
 Plug 'airblade/vim-gitgutter'
 Plug 'itchyny/lightline.vim'
+Plug 'itchyny/vim-gitbranch'
 Plug 'easymotion/vim-easymotion'
 Plug 'romainl/vim-qf'
 Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh \| UpdateRemotePlugins' }
+Plug 'scrooloose/nerdtree'
+Plug 'chrisbra/NrrwRgn'
 " --------------------------------------------------------------------------}}}
 
 " FZF ----------------------------------------------------------------------{{{
@@ -35,11 +39,16 @@ Plug 'bazelbuild/vim-bazel'
 
 " Syntax Highlight ---------------------------------------------------------{{{
 Plug 'GutenYe/json5.vim'
-" Plug 'dag/vim-fish'
+Plug 'dag/vim-fish'
+Plug 'octol/vim-cpp-enhanced-highlight'
 " --------------------------------------------------------------------------}}}
 
 " Colorschemes -------------------------------------------------------------{{{
 Plug 'morhetz/gruvbox'
+" --------------------------------------------------------------------------}}}
+
+" Formatting ---------------------------------------------------------------{{{
+Plug 'rhysd/vim-clang-format'
 " --------------------------------------------------------------------------}}}
 
 " LSP ----------------------------------------------------------------------{{{
@@ -54,8 +63,19 @@ call plug#end()
 " General config -----------------------------------------------------------{{{
 set tabstop=8 softtabstop=0 expandtab shiftwidth=4 smarttab
 let mapleader = " "
+
+let g:gruvbox_contrast_dark='soft'
 colorscheme gruvbox
-let g:lightline = { 'colorscheme': 'wombat', }
+let g:lightline = {
+      \ 'colorscheme': 'wombat',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'gitbranch#name'
+      \ },
+      \ }
 set ignorecase
 set smartcase
 
@@ -69,6 +89,23 @@ set signcolumn=yes
 set mouse=a
 
 set shell=/bin/bash\ --login
+noremap <silent><expr> <leader>g &ft=="fugitive" ? ":normal gq<cr>" : ":Gstatus<cr>"
+
+let NERDTreeMinimalUI = 1
+let NERDTreeDirArrows = 1
+noremap <silent><expr> <leader>f &ft=="nerdtree" ? ":NERDTreeClose<cr>" : ":NERDTreeFind<cr>"
+
+let g:nrrw_rgn_nomap_nr = 1
+vnoremap <silent><expr> <leader>nr ":NR!<cr>"
+vnoremap <silent><expr> <leader>nw ":NW<cr>"
+
+augroup cppsrc
+    autocmd!
+    autocmd FileType cpp setlocal foldmethod=indent |
+                       \ setlocal foldnestmax=10 |
+                       \ setlocal nofoldenable |
+                       \ setlocal foldlevel=2
+augroup END
 " --------------------------------------------------------------------------}}}
 
 " folding ------------------------------------------------------------------{{{
@@ -83,16 +120,35 @@ augroup manifestfiles
   autocmd!
   autocmd BufRead,BufNewFile manifest.json setlocal filetype=json5
   autocmd BufRead,BufNewFile *.osl setlocal filetype=cpp
-  autocmd BufRead,BufNewFile *.osl let b:coc_enabled = 0
+  autocmd BufRead,BufNewFile *.osl exec ":CocDisable"
 augroup END
 " --------------------------------------------------------------------------}}}
 
 " Navigation ---------------------------------------------------------------{{{
-nnoremap <leader>p :Files<cr>
-nnoremap <leader>o :Buffers<cr>
-nnoremap <leader>r :History:<cr>
-nnoremap <leader>rg :execute 'Rg <c-r><c-w>'<cr>
-nmap s <Plug>(easymotion-s)
+nnoremap <silent> <leader>p :Files<cr>
+nnoremap <silent> <leader>o :Buffers<cr>
+nnoremap <silent> <leader>r :History:<cr>
+nnoremap <silent> <leader>rg :execute 'Rg <c-r><c-w>'<cr>
+map s <Plug>(easymotion-s)
+
+function! s:open_branch_fzf(line)
+  let l:parser = split(a:line)
+  let l:branch = l:parser[0]
+  if l:branch ==? '*'
+    let l:branch = l:parser[1]
+  endif
+  let l:branch = substitute(l:branch, 'remotes/origin/', '', '')
+  execute '!git checkout ' . l:branch
+endfunction
+
+command! -bang -nargs=0 Gcheckout
+  \ call fzf#vim#grep(
+  \   'git branch -v -a', 0,
+  \   {
+  \     'sink': function('s:open_branch_fzf')
+  \   },
+  \   <bang>0
+  \ )
 " --------------------------------------------------------------------------}}}
 
 " LSP ----------------------------------------------------------------------{{{
@@ -114,8 +170,10 @@ function! s:check_back_space() abort
     return !col || getline('.')[col - 1] =~# '\s'
 endfunction
 
-"inoremap <silent><expr> <c-space> coc#refresh()
-inoremap <expr> <cr> pumvisible() ? "\<c-y>" : "\<c-g>u\<cr>"
+" inoremap <silent><expr> <c-space> coc#refresh()
+" inoremap <expr> <cr> pumvisible() ? "\<c-y>" : "\<c-g>u\<cr>"
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+                        \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 let g:vista_fzf_preview = ['right:50%']
 let g:vista_executive_for = {
@@ -130,7 +188,7 @@ nmap <leader>sr <Plug>(coc-rename)
 nmap <leader>sc <Plug>(coc-references)
 nnoremap <leader>so :Vista!!<cr>
 nnoremap <leader>ss :Vista finder coc<cr>
-nnoremap <leader>sh :call <SID>show_documentation()<cr>
+nnoremap <silent> <leader>sh :call <SID>show_documentation()<cr>
 
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
@@ -145,6 +203,12 @@ augroup coc
     autocmd CursorHold * silent call CocActionAsync('highlight')
     autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
+
+" --------------------------------------------------------------------------}}}
+
+" Formatting ---------------------------------------------------------------{{{
+let g:clang_format#detect_style_file = 1
+let g:clang_format#auto_format = 1
 " --------------------------------------------------------------------------}}}
 
 " Autocmd Bazel ------------------------------------------------------------{{{
@@ -193,7 +257,7 @@ function! DispatchBazelTest(...)
 endfunction
 
 function! StartBazelDebug(target)
-    let l:dispatch_command = "Start bd --copt=-ggdb " . trim(a:target)
+    let l:dispatch_command = "Start /home/rosdosal/werkstatt/tools/docker/bazel_gdbserver.sh --copt=-ggdb " . trim(a:target)
     call histadd("cmd", l:dispatch_command)
     exec l:dispatch_command
 endfunction
@@ -221,16 +285,6 @@ nnoremap <expr> <leader>bd ':BazelDebug ' . getreg("t")
 nnoremap <expr> <leader>bt ':BazelTest ' . getreg("t")
 
 
-function! FormatBuffer()
-    let l:cursor = getcurpos()
-    if &ft =~# '^\%(c\|cpp\)$'
-        silent exec "%!clang-format -style=File"
-    elseif &ft =~# '^\%(bzl\)$'
-        silent exec "%!buildifier"
-    endif
-    call setpos('.', l:cursor)
-endfunction
-
 let g:clang_include_fixer_path = "/usr/lib/llvm-8/bin/clang-include-fixer"
 
 let g:nvimgdb_config_override = {
@@ -254,8 +308,4 @@ endfunction
 
 nnoremap <leader>dd :call LaunchGdb()<cr>
 
-augroup bazelproject
-    autocmd!
-    autocmd BufWritePost * call FormatBuffer()
-augroup END
 " --------------------------------------------------------------------------}}}

@@ -21,6 +21,7 @@ set -xg  NVM_DIR $HOME/.nvm
 # dots
 alias dots="/usr/bin/git --git-dir=$HOME/.dots.git/ --work-tree=$HOME"
 alias dotss="dots status -s"
+alias dotsu="dots add -u && dots commit -m \"update\""
 
 alias cat="bat"
 alias ls="exa"
@@ -55,6 +56,9 @@ set -gx FZF_DEFAULT_COMMAND 'rg --files --ignore-vcs -g "!bazel-*"'
 set -gx FZF_CTRL_T_COMMAND $FZF_DEFAULT_COMMAND
 set -gx FZF_ALT_C_COMMAND 'rg --sort-files --files --ignore-vcs -g "!bazel-*" --null 2> /dev/null | xargs -0 dirname | uniq'
 
-alias cdb="tools/docker/run_in_docker.sh tools/style/generate_compile_commands.sh"
+function cdb --description "generate compile database and bazel targets"
+    tools/docker/run_in_docker.sh tools/style/generate_compile_commands.sh
+    # bz query --noshow_progress 'kind("cc_.*", //...)' 2>/dev/null > .cache/bazel_targets.log
+end
 
 set -xg RTI_LICENSE_FILE $HOME/rti_license/rti_license.dat

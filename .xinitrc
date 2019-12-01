@@ -10,4 +10,6 @@ fi
 polybar -r bar &
 feh --bg-scale ~/Pictures/wallpapers/ds_static.jpg
 
+setxkbmap -option caps:escape &
+
 exec xmonad
