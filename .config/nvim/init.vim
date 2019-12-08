@@ -57,6 +57,10 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " Plug 'Valloric/YouCompleteMe', {'do': './install.py --clang-completion --clangd-completion --rust-completer' }
 " --------------------------------------------------------------------------}}}
 
+" Rust ---------------------------------------------------------------------{{{
+Plug 'rust-lang/rust.vim'
+" --------------------------------------------------------------------------}}}
+
 call plug#end()
 " --------------------------------------------------------------------------}}}
 
@@ -87,6 +91,9 @@ set updatetime=300
 set shortmess+=c
 set signcolumn=yes
 set mouse=a
+set splitright
+set number
+set termguicolors
 
 set shell=/bin/bash\ --login
 noremap <silent><expr> <leader>g &ft=="fugitive" ? ":normal gq<cr>" : ":Gstatus<cr>"
@@ -111,7 +118,7 @@ augroup END
 " folding ------------------------------------------------------------------{{{
 augroup vimrc
   autocmd!
-  autocmd BufReadPre * setlocal foldmethod=marker
+  autocmd FileType vim setlocal foldmethod=marker
 augroup END
 " --------------------------------------------------------------------------}}}
 
@@ -159,21 +166,19 @@ command! -bang -nargs=0 Gcheckout
 " nnoremap <leader>th :YcmCompleter GetDoc<cr>
 " nnoremap <leader>tt :YcmCompleter GetType<cr>
 
-inoremap <silent><expr> <tab>
-    \ pumvisible() ? "\<c-n>" :
-    \ <sid>check_back_space() ? "\<tab>" :
-    \ coc#refresh()
-inoremap <expr> <s-tab> pumvisible() ? "\<c-p>": "\<c-h>"
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? coc#_select_confirm() :
+      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
 
 function! s:check_back_space() abort
-    let col = col('.') - 1
-    return !col || getline('.')[col - 1] =~# '\s'
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
-" inoremap <silent><expr> <c-space> coc#refresh()
-" inoremap <expr> <cr> pumvisible() ? "\<c-y>" : "\<c-g>u\<cr>"
-inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
-                        \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+let g:coc_snippet_next = '<tab>'
+let g:coc_snippet_prev = '<s-tab>'
 
 let g:vista_fzf_preview = ['right:50%']
 let g:vista_executive_for = {
@@ -183,11 +188,14 @@ let g:vista_sidebar_width = 90
 
 nmap <leader>sd <Plug>(coc-definition)
 nmap <leader>sf <Plug>(coc-declaration)
+nmap <leader>st <Plug>(coc-type-definition)
 nmap <leader>si <Plug>(coc-implementation)
 nmap <leader>sr <Plug>(coc-rename)
 nmap <leader>sc <Plug>(coc-references)
+
+nnoremap <leader>ss :CocList --interactive --number-select symbols<cr>
 nnoremap <leader>so :Vista!!<cr>
-nnoremap <leader>ss :Vista finder coc<cr>
+nnoremap <leader>sv :Vista finder coc<cr>
 nnoremap <silent> <leader>sh :call <SID>show_documentation()<cr>
 
 function! s:show_documentation()
@@ -209,6 +217,11 @@ augroup end
 " Formatting ---------------------------------------------------------------{{{
 let g:clang_format#detect_style_file = 1
 let g:clang_format#auto_format = 1
+" --------------------------------------------------------------------------}}}
+
+" Rust ---------------------------------------------------------------------{{{
+let g:rustfmt_autosave = 1
+let g:rust_clip_command = 'xclip -selection clipboard'
 " --------------------------------------------------------------------------}}}
 
 " Autocmd Bazel ------------------------------------------------------------{{{
@@ -257,7 +270,7 @@ function! DispatchBazelTest(...)
 endfunction
 
 function! StartBazelDebug(target)
-    let l:dispatch_command = "Start /home/rosdosal/werkstatt/tools/docker/bazel_gdbserver.sh --copt=-ggdb " . trim(a:target)
+    let l:dispatch_command = "Start /home/rosdosal/werkstatt/tools/docker/bazel_gdbserver.sh --copt=-g --copt=-O0 " . trim(a:target)
     call histadd("cmd", l:dispatch_command)
     exec l:dispatch_command
 endfunction
