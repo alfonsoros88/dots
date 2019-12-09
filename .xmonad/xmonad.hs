@@ -13,7 +13,7 @@ import qualified XMonad.StackSet as W
 main = do
     forM_ [".xmonad-workspace-log", ".xmonad-title-log"] $ \file -> do safeSpawn "mkfifo" ["/tmp/" ++ file]
     xmonad $ desktopConfig
-        { terminal = "kitty tmux"
+        { terminal = "kitty tmux -Lkitty"
         , layoutHook = spacingRaw True (Border 0 10 10 10) True (Border 10 10 10 10) True $ layoutHook desktopConfig
         , logHook = eventLogHook
         } 

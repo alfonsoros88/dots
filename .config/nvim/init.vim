@@ -34,6 +34,7 @@ Plug 'christoomey/vim-tmux-navigator'
 
 " Bazel --------------------------------------------------------------------{{{
 Plug 'google/vim-maktaba'
+Plug 'google/vim-glaive'
 Plug 'bazelbuild/vim-bazel'
 " --------------------------------------------------------------------------}}}
 
@@ -54,7 +55,6 @@ Plug 'rhysd/vim-clang-format'
 " LSP ----------------------------------------------------------------------{{{
 Plug 'liuchengxu/vista.vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-" Plug 'Valloric/YouCompleteMe', {'do': './install.py --clang-completion --clangd-completion --rust-completer' }
 " --------------------------------------------------------------------------}}}
 
 " Rust ---------------------------------------------------------------------{{{
@@ -80,9 +80,9 @@ let g:lightline = {
       \   'gitbranch': 'gitbranch#name'
       \ },
       \ }
+
 set ignorecase
 set smartcase
-
 set hidden
 set nobackup
 set nowritebackup
@@ -94,8 +94,10 @@ set mouse=a
 set splitright
 set number
 set termguicolors
-
 set shell=/bin/bash\ --login
+
+" avoid jump when using *
+noremap * m`:keepjumps normal! *``<cr>
 noremap <silent><expr> <leader>g &ft=="fugitive" ? ":normal gq<cr>" : ":Gstatus<cr>"
 
 let NERDTreeMinimalUI = 1
@@ -113,6 +115,7 @@ augroup cppsrc
                        \ setlocal nofoldenable |
                        \ setlocal foldlevel=2
 augroup END
+
 " --------------------------------------------------------------------------}}}
 
 " folding ------------------------------------------------------------------{{{
@@ -159,13 +162,6 @@ command! -bang -nargs=0 Gcheckout
 " --------------------------------------------------------------------------}}}
 
 " LSP ----------------------------------------------------------------------{{{
-" let g:ycm_clangd_binary_path = "/usr/bin/clangd-6.0"
-" nnoremap <leader>tg :YcmCompleter GoToDefinition<cr>
-" nnoremap <leader>td :YcmCompleter GoToDeclaration<cr>
-" nnoremap <leader>ti :YcmCompleter GoToInclude<cr>
-" nnoremap <leader>th :YcmCompleter GetDoc<cr>
-" nnoremap <leader>tt :YcmCompleter GetType<cr>
-
 inoremap <silent><expr> <TAB>
       \ pumvisible() ? coc#_select_confirm() :
       \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
