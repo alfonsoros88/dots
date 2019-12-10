@@ -1,0 +1,102 @@
+---
+- name: My environment
+  hosts: 127.0.0.1
+  connection: local
+  vars:
+    home_directory: "{{ lookup('env', 'HOME') }}"
+    user_bin_directory: "{{ lookup('env', 'HOME') }}/bin"
+
+  roles:
+    - role: fubarhouse.rust
+      vars:
+        rust_version: 1.38.0
+        cargo_items:
+            - name: ripgrep
+           - name: fd-find
+            - name: bat
+            - name: exa
+ 
+  tasks:
+    - name: Add fish apt repository
+      become: yes
+      apt_repository:
+          repo: 'ppa:fish-shell/release-3'
+
+    - name: Add golang apt repository
+      become: yes
+      apt_repository:
+          repo: 'ppa:longsleep/golang-backports'
+
+    - name: Install APT packages
+      become: yes
+      apt:
+          name:
+            - rxvt-unicode-256color
+            - tmux
+            - tig
+            - fish
+            - tldr
+            - tree
+            - xclip
+            - golang-go
+            - haskell-platform
+            - clang-format
+            - clang-tidy
+            - clang-tools
+            - python3-pip
+            - xmonad
+            - libx11-dev
+            - suckless-tools
+            - gawk
+            - feh
+          update_cache: true
+          state: present
+
+    - name: Install python packages
+      pip:
+          executable: '/usr/bin/pip3'
+          name:
+              - pynvim>=0.3.2
+
+    - name: Create home bin directory
+      file:
+          path: "{{ user_bin_directory }}"
+          state: directory
+
+    - name: Get neovim app
+      get_url:
+          url: https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage
+          dest: "{{ user_bin_directory }}/nvim"
+          mode: '0755'
+
+    - name: Update vi alternative
+      become: yes
+      alternatives:
+          name: vi
+          link: /usr/bin/vi
+          path: "{{ user_bin_directory }}/nvim"
+
+    - name: Create neovim pluggin folder
+      file:
+          path: "{{ home_directory }}/.local/share/nvim/site/autoload/"
+          state: directory
+
+    - name: Install vim-plug
+      get_url:
+        url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        dest: "{{ home_directory }}/.local/share/nvim/site/autoload/"
+
+    - name: Install tpm
+      git:
+          repo: https://github.com/tmux-plugins/tpm
+          dest: "{{ home_directory }}/.tmux/plugins/tpm"
+
+          #    - name: Download oh-my-fish
+          #      get_url:
+          #          url: https://get.oh-my.fish 
+          #          dest: "/tmp/fish.install"
+          #          mode: '0755'
+
+          #    - name: Install oh-my-fish
+          #      shell: /tmp/fish.install -y
+

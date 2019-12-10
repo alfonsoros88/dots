@@ -3,8 +3,6 @@ call plug#begin('~/.vim/plugged')
 
 " General ------------------------------------------------------------------{{{
 let g:dispatch_no_maps = 1
-let g:nvimgdb_disable_start_keymaps = 1
-
 Plug 'tpope/vim-sensible'
 " Plug 'tpope/vim-vinegar'
 Plug 'tpope/vim-dispatch'
@@ -21,6 +19,8 @@ Plug 'romainl/vim-qf'
 Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh \| UpdateRemotePlugins' }
 Plug 'scrooloose/nerdtree'
 Plug 'chrisbra/NrrwRgn'
+Plug 'francoiscabrol/ranger.vim'
+
 " --------------------------------------------------------------------------}}}
 
 " FZF ----------------------------------------------------------------------{{{
@@ -103,6 +103,14 @@ noremap <silent><expr> <leader>g &ft=="fugitive" ? ":normal gq<cr>" : ":Gstatus<
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 noremap <silent><expr> <leader>f &ft=="nerdtree" ? ":NERDTreeClose<cr>" : ":NERDTreeFind<cr>"
+
+noremap <silent><expr> <leader>w ":Ranger<cr>"
+
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+let g:netrw_browse_split = 4
+let g:netrw_altv = 1
+let g:netrw_winsize = 25
 
 let g:nrrw_rgn_nomap_nr = 1
 vnoremap <silent><expr> <leader>nr ":NR!<cr>"
@@ -296,21 +304,7 @@ nnoremap <expr> <leader>bt ':BazelTest ' . getreg("t")
 
 let g:clang_include_fixer_path = "/usr/lib/llvm-8/bin/clang-include-fixer"
 
-let g:nvimgdb_config_override = {
-            \ 'key_until':      '<leader>du',
-            \ 'key_continue':   '<leader>dc',
-            \ 'key_next':       '<leader>dn',
-            \ 'key_step':       '<leader>ds',
-            \ 'key_finish':     '<leader>df',
-            \ 'key_breakpoint': '<leader>db',
-            \ 'key_frameup':    '<leader>dk',
-            \ 'key_framedown':  '<leader>dj',
-            \ 'key_eval':       '<leader>de',
-            \ 'split_command': 'split'
-            \ }
-
 function! LaunchGdb()
-    "let l:gdb_command = "gdb -ex 'target remote :2008' -ex 'directory " . GetBazelRootPath() . "'"
     let l:gdb_command = "gdb -ex 'target remote :2008' -ex 'directory " . GetBazelRootPath() . "'"
     exec "GdbStart " . l:gdb_command
 endfunction
