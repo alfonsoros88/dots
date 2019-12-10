@@ -9,14 +9,14 @@
   roles:
     - role: fubarhouse.rust
       vars:
-        rust_version: 1.38.0
+        rust_version: 1.39.0
         cargo_items:
             - name: ripgrep
-           - name: fd-find
+            - name: fd-find
             - name: bat
             - name: exa
  
-  tasks:
+  pre_tasks:
     - name: Add fish apt repository
       become: yes
       apt_repository:
@@ -31,7 +31,8 @@
       become: yes
       apt:
           name:
-            - rxvt-unicode-256color
+            - curl
+            - gcc
             - tmux
             - tig
             - fish
@@ -44,24 +45,115 @@
             - clang-tidy
             - clang-tools
             - python3-pip
-            - xmonad
+            - python-pip
             - libx11-dev
             - suckless-tools
             - gawk
             - feh
+            - rofi
+            - i3lock-fancy
+            - libxrandr-dev
+            - libxss-dev
+            - arandr
+            - nodejs
+            - nodejs-dev
+            - node-gyp
+            - libssl1.0-dev
+            - npm
+            - fonts-firacode
+            - clang
+            - libclang-6.0-dev
+            - libclang-dev
+            - llvm
+            - llvm-dev
+            - llvm-runtime
+            - rapidjson-dev
+
+              # polybar dependencies
+            - build-essential
+            - git
+            - cmake
+            - cmake-data
+            - pkg-config
+            - python3-sphinx
+            - libcairo2-dev
+            - libxcb1-dev
+            - libxcb-util0-dev
+            - libxcb-randr0-dev
+            - libxcb-composite0-dev
+            - python-xcbgen
+            - xcb-proto
+            - libxcb-image0-dev
+            - libxcb-ewmh-dev
+            - libxcb-icccm4-dev
+            - libcurl4
+
+              # polybar optional
+            - libxcb-xkb-dev
+            - libxcb-xrm-dev 
+            - libxcb-cursor-dev
+            - libasound2-dev
+            - libpulse-dev
+            - libjsoncpp-dev
+            - libmpdclient-dev
+            - libcurl4-openssl-dev 
+            - libnl-genl-3-dev
+
           update_cache: true
           state: present
 
-    - name: Install python packages
+    - name: Install python 3 packages
       pip:
           executable: '/usr/bin/pip3'
           name:
               - pynvim>=0.3.2
+              - ranger-fm>=1.9.2
+
+    - name: Install python 2 packages
+      pip:
+          executable: '/usr/bin/pip2'
+          name:
+              - pexpect
 
     - name: Create home bin directory
       file:
           path: "{{ user_bin_directory }}"
           state: directory
+
+    - name: Download kitty installer
+      get_url:
+          url: https://sw.kovidgoyal.net/kitty/installer.sh
+          dest: "/tmp/kitty_installer.sh"
+          mode: '0755'
+
+    - name: Install kitty
+      shell: /tmp/kitty_installer.sh
+
+    - name: Create kitty symlink
+      file:
+        src: "{{ home_directory }}/.local/kitty.app/bin/kitty"
+        dest: "{{ user_bin_directory }}/kitty"
+        state: link
+
+    - name: Download oh-my-fish installer
+      get_url:
+          url: https://get.oh-my.fish
+          dest: "/tmp/ohmyfish_installer.sh"
+          mode: '0755'
+
+    - name: Install oh-my-fish
+      expect:
+          command: /tmp/ohmyfish_installer.sh
+          responses:
+              Would you like to remove the existing installation?: y
+              Are you sure you want to continue?: y
+
+    - name: Install nodejs packages
+      become: yes
+      npm:
+          name: neovim
+          global: yes
+          state: present
 
     - name: Get neovim app
       get_url:
@@ -78,8 +170,11 @@
 
     - name: Create neovim pluggin folder
       file:
-          path: "{{ home_directory }}/.local/share/nvim/site/autoload/"
+          path: "{{ item }}"
           state: directory
+      loop:
+          - "{{ home_directory }}/.local/share/nvim/site/autoload/"
+          - "{{ home_directory }}/.vim/plugged"
 
     - name: Install vim-plug
       get_url:
@@ -91,12 +186,19 @@
           repo: https://github.com/tmux-plugins/tpm
           dest: "{{ home_directory }}/.tmux/plugins/tpm"
 
-          #    - name: Download oh-my-fish
-          #      get_url:
-          #          url: https://get.oh-my.fish 
-          #          dest: "/tmp/fish.install"
-          #          mode: '0755'
+    - name: Update cabal
+      command: cabal update
 
-          #    - name: Install oh-my-fish
-          #      shell: /tmp/fish.install -y
+    - name: Install haskell packages
+      command: cabal install {{ item }}
+      loop:
+          - xmonad
+          - xmonad-contrib
+          - stack
 
+    - name: Create custom desktop session
+      become: yes
+      copy:
+          src: custom.desktop
+          dest: /usr/share/xsessions/custom.desktop
+    

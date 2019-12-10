@@ -38,15 +38,9 @@ primary = #1f222d
 secondary = #FF6200
 alert = #fb4934
 
-[bar/office]
-monitor = ${env:MONITOR:HDMI1}
-inherit = bar/base
+[bar/default]
+monitor = ${env:MONITOR:DP-4}
 
-[bar/mobile]
-monitor = ${env:MONITOR:eDP-1-1}
-inherit = bar/base
-
-[bar/base]
 width = 140%
 height = 30
 ;offset-x = 1%
@@ -70,16 +64,18 @@ padding-right = 2
 module-margin-left = 2
 module-margin-right = 2
 
-font-0 = fixed:pixelsize=18;1
-;font-1 = unifont:fontformat=truetype:size=8:antialias=false;0
-font-1 = Fira Code:fontformat=truetype:size=12:antialias=false;0
-font-2 = siji:pixelsize=18;1
+;font-0 = FiraCode Nerd Font Mono:style=Regular:size=12
+font-0 = Fira Code:style=Light,Regular:size=12
+font-1 = unifont:fontformat=truetype:size=8:antialias=false;0
+font-2 = siji:pixelsize=18
+
+;font-0 = fixed:pixelsize=18;1
 
 modules-left = workspaces-xmonad title-xmonad
 ; bspwm i3
 modules-center =
 ;mpd
-modules-right = filesystem xbacklight alsa pulseaudio xkeyboard memory cpu wlan eth battery temperature date powermenu 
+modules-right = filesystem xbacklight alsa pulseaudio xkeyboard memory cpu eth temperature date powermenu 
 
 tray-position = right
 tray-padding = 2
@@ -277,7 +273,7 @@ ramp-signal-foreground = ${colors.foreground-alt}
 
 [module/eth]
 type = internal/network
-interface = wwp0s20f0u7
+interface = enp4s0
 interval = 3.0
 
 format-connected-underline = #55aa55

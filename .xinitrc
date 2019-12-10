@@ -3,14 +3,10 @@ xrdb -merge ~/.Xresources
 
 PATH=$PATH:~/.cabal/bin:~/.xmonad/bin
 
-if $(xrandr | awk '/HDMI-1 connected/'); then
-    ~/.screenlayout/aid_desk.sh
-fi
+polybar -r default &
 
-polybar -r mobile &
+feh --bg-scale ~/Pictures/bg1.jpg
 
-feh --bg-scale ~/Pictures/wallpapers/ds_static.jpg
+setxkbmap -option caps:escape &
 
-xkbcomp -I$HOME/.xkb ~/.xkb/keymap/mykbd $DISPLAY &
-
-exec xmonad
+exec ~/.cabal/bin/xmonad
