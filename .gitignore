@@ -4,5 +4,6 @@
 !.xmonad/xmonad.hs
 !.config/nvim
 !.config/fish
+!.config/polybar
 !.local/share/fonts
 !setup
