@@ -43,6 +43,10 @@ abbr -a -g bb bz build
 abbr -a -g bt bz test --cache_test_results=no
 abbr -a -g br bz run
 
+function fco --description "checkout branch"
+  git branch --all | grep -v HEAD | string trim | fzf | read -l result; and git checkout "$result"
+end
+
 #alias k='`git rev-parse --show-toplevel 2>/dev/null`/tools/docker/killrunning.py'
 #alias dr='`git rev-parse --show-toplevel 2>/dev/null`/tools/docker/run_in_docker.py'
 
@@ -57,7 +61,8 @@ set -gx FZF_CTRL_T_COMMAND $FZF_DEFAULT_COMMAND
 set -gx FZF_ALT_C_COMMAND 'rg --sort-files --files --ignore-vcs -g "!bazel-*" --null 2> /dev/null | xargs -0 dirname | uniq'
 
 function cdb --description "generate compile database and bazel targets"
-    tools/docker/run_in_docker.sh tools/style/generate_compile_commands.sh
+    set werkstatt (git rev-parse --show-toplevel 2>/dev/null)
+    $werkstatt/tools/docker/run_in_docker.sh tools/style/generate_compile_commands.sh $argv
     # bz query --noshow_progress 'kind("cc_.*", //...)' 2>/dev/null > .cache/bazel_targets.log
 end
 

@@ -20,6 +20,7 @@ Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh \| UpdateRemotePlugins' }
 Plug 'scrooloose/nerdtree'
 Plug 'chrisbra/NrrwRgn'
 Plug 'francoiscabrol/ranger.vim'
+Plug 't9md/vim-quickhl'
 
 " --------------------------------------------------------------------------}}}
 
@@ -94,7 +95,7 @@ set mouse=a
 set splitright
 set number
 set termguicolors
-set shell=/bin/bash\ --login
+set shell=/bin/bash
 
 " avoid jump when using *
 noremap * m`:keepjumps normal! *``<cr>
@@ -104,6 +105,7 @@ let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 noremap <silent><expr> <leader>f &ft=="nerdtree" ? ":NERDTreeClose<cr>" : ":NERDTreeFind<cr>"
 
+let g:ranger_map_keys = 0
 noremap <silent><expr> <leader>w ":Ranger<cr>"
 
 let g:netrw_banner = 0
@@ -123,6 +125,11 @@ augroup cppsrc
                        \ setlocal nofoldenable |
                        \ setlocal foldlevel=2
 augroup END
+
+nmap <leader>m <Plug>(quickhl-manual-this)
+xmap <leader>m <Plug>(quickhl-manual-this)
+nmap <leader>M <Plug>(quickhl-manual-reset)
+xmap <leader>M <Plug>(quickhl-manual-reset)
 
 " --------------------------------------------------------------------------}}}
 
