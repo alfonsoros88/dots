@@ -11,9 +11,6 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-obsession'
 Plug 'tpope/vim-eunuch'
-Plug 'airblade/vim-gitgutter'
-Plug 'itchyny/lightline.vim'
-Plug 'itchyny/vim-gitbranch'
 Plug 'easymotion/vim-easymotion'
 Plug 'romainl/vim-qf'
 Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh \| UpdateRemotePlugins' }
@@ -21,7 +18,14 @@ Plug 'scrooloose/nerdtree'
 Plug 'chrisbra/NrrwRgn'
 Plug 'francoiscabrol/ranger.vim'
 Plug 't9md/vim-quickhl'
+Plug 'kana/vim-submode'
+Plug 'romainl/vim-cool'
+Plug 'scrooloose/nerdcommenter'
+" --------------------------------------------------------------------------}}}
 
+" Interface ----------------------------------------------------------------{{{
+Plug 'airblade/vim-gitgutter'
+Plug 'itchyny/lightline.vim'
 " --------------------------------------------------------------------------}}}
 
 " FZF ----------------------------------------------------------------------{{{
@@ -62,6 +66,13 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'rust-lang/rust.vim'
 " --------------------------------------------------------------------------}}}
 
+" Bitbucket ----------------------------------------------------------------{{{
+Plug '~/projects/neovim-bucket'
+" --------------------------------------------------------------------------}}}
+
+" Miscellaneous ------------------------------------------------------------{{{
+Plug 'vimwiki/vimwiki'
+" --------------------------------------------------------------------------}}}
 call plug#end()
 " --------------------------------------------------------------------------}}}
 
@@ -72,15 +83,30 @@ let mapleader = " "
 let g:gruvbox_contrast_dark='soft'
 colorscheme gruvbox
 let g:lightline = {
-      \ 'colorscheme': 'wombat',
+      \ 'colorscheme': 'gruvbox',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
       \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
       \ },
       \ 'component_function': {
-      \   'gitbranch': 'gitbranch#name'
+      \   'gitbranch': 'GitVersion'
       \ },
       \ }
+
+function! GitVersion()
+  let fullname = expand('%')
+  let gitversion = ''
+  if fullname =~? 'fugitive://.*/\.git//0/.*'
+      let gitversion = 'git index'
+  elseif fullname =~? 'fugitive://.*/\.git//2/.*'
+      let gitversion = 'git target'
+  elseif fullname =~? 'fugitive://.*/\.git//3/.*'
+      let gitversion = 'git merge'
+  elseif &diff == 1
+      let gitversion = 'working copy'
+  endif
+  return gitversion
+endfunction
 
 set ignorecase
 set smartcase
@@ -106,7 +132,7 @@ let NERDTreeDirArrows = 1
 noremap <silent><expr> <leader>f &ft=="nerdtree" ? ":NERDTreeClose<cr>" : ":NERDTreeFind<cr>"
 
 let g:ranger_map_keys = 0
-noremap <silent><expr> <leader>w ":Ranger<cr>"
+"noremap <silent><expr> <leader>w ":Ranger<cr>"
 
 let g:netrw_banner = 0
 let g:netrw_liststyle = 3
@@ -126,8 +152,27 @@ augroup cppsrc
                        \ setlocal foldlevel=2
 augroup END
 
+" multiple highlights
 nmap <leader>m <Plug>(quickhl-manual-this)
 nmap <leader>M <Plug>(quickhl-manual-reset)
+
+" configure vi
+nmap <leader>cv :tabnew $MYVIMRC<cr>
+
+" reize splits
+call submode#enter_with('grow/shrink', 'n', '', '<leader>w+', ':res +5<cr>')
+call submode#enter_with('grow/shrink', 'n', '', '<leader>w-', ':res -5<cr>')
+call submode#enter_with('grow/shrink', 'n', '', '<leader>w>', ':vertical resize +5<cr>')
+call submode#enter_with('grow/shrink', 'n', '', '<leader>w<', ':vertical resize -5<cr>')
+call submode#map('grow/shrink', 'n', '', '+', ':res +5<cr>')
+call submode#map('grow/shrink', 'n', '', '-', ':res -5<cr>')
+call submode#map('grow/shrink', 'n', '', '>', ':vertical resize +5<cr>')
+call submode#map('grow/shrink', 'n', '', '<', ':vertical resize -5<cr>')
+
+" commenter
+let g:NERDCommenterMappings = 0
+nmap <leader>cc <plug>NERDCommenterToggle
+vmap <leader>cc <plug>NERDCommenterToggle
 
 " --------------------------------------------------------------------------}}}
 
@@ -141,9 +186,8 @@ augroup END
 " HighLight ----------------------------------------------------------------{{{
 augroup manifestfiles
   autocmd!
-  autocmd BufRead,BufNewFile manifest.json setlocal filetype=json5
-  autocmd BufRead,BufNewFile *.osl setlocal filetype=cpp
-  autocmd BufRead,BufNewFile *.osl exec ":CocDisable"
+  autocmd BufRead,BufNewFile manifest*.json setlocal filetype=json5
+  autocmd BufRead,BufNewFile *.osl setlocal syntax=cpp
 augroup END
 " --------------------------------------------------------------------------}}}
 
@@ -202,7 +246,7 @@ nmap <leader>si <Plug>(coc-implementation)
 nmap <leader>sr <Plug>(coc-rename)
 nmap <leader>sc <Plug>(coc-references)
 
-nnoremap <leader>ss :CocList --interactive --number-select symbols<cr>
+nnoremap <leader>ss :CocList --interactive symbols<cr>
 nnoremap <leader>so :Vista!!<cr>
 nnoremap <leader>sv :Vista finder coc<cr>
 nnoremap <silent> <leader>sh :call <SID>show_documentation()<cr>
@@ -214,6 +258,8 @@ function! s:show_documentation()
     call CocAction('doHover')
   endif
 endfunction
+
+highlight CocHighlightText guifg=#fbf1c7 guibg=#665c54
 
 augroup coc
     autocmd!

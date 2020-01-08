@@ -8,14 +8,24 @@ import Data.Function (on)
 import Control.Monad (forM_, join)
 import XMonad.Util.Run (safeSpawn)
 import XMonad.Util.NamedWindows (getName)
+import XMonad.Hooks.UrgencyHook
 import qualified XMonad.StackSet as W
+
+data LibNotifyUrgencyHook = LibNotifyUrgencyHook deriving (Read, Show)
+
+instance UrgencyHook LibNotifyUrgencyHook where
+    urgencyHook LibNotifyUrgencyHook w = do
+        name <- getName w
+        Just idx <- fmap (W.findTag w) $ gets windowset
+        safeSpawn "notify-send" [show name, "workspace " ++ idx]
 
 main = do
     forM_ [".xmonad-workspace-log", ".xmonad-title-log"] $ \file -> do safeSpawn "mkfifo" ["/tmp/" ++ file]
-    xmonad $ desktopConfig
+    xmonad $ withUrgencyHook LibNotifyUrgencyHook $ desktopConfig
         { terminal = "kitty tmux -Lkitty"
         , layoutHook = spacingRaw True (Border 0 10 10 10) True (Border 10 10 10 10) True $ layoutHook desktopConfig
         , logHook = eventLogHook
+        , focusedBorderColor = "#98971a"
         } 
         `additionalKeysP` 
         [ ("M-S-l", spawn "i3lock-fancy -p")

@@ -3,6 +3,7 @@ xrdb -merge ~/.Xresources
 
 PATH=$PATH:~/.cabal/bin:~/.xmonad/bin
 
+/usr/lib/notification-daemon/notification-daemon &
 polybar -r default &
 
 feh --bg-scale ~/Pictures/bg1.jpg

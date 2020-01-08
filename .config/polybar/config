@@ -78,7 +78,7 @@ modules-center =
 modules-right = filesystem xbacklight alsa pulseaudio xkeyboard memory cpu eth temperature date powermenu 
 
 tray-position = right
-tray-padding = 2
+tray-padding = 10
 ;tray-background = #0063ff
 
 ;wm-restack = bspwm
