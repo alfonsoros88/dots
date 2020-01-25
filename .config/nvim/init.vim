@@ -1,12 +1,17 @@
+" Disable mappings ---------------------------------------------------------{{{
+let g:dispatch_no_maps = 1
+let g:NERDCommenterMappings = 0
+let g:bookmark_no_default_key_mappings = 1
+" --------------------------------------------------------------------------}}}
+
 " Plug ---------------------------------------------------------------------{{{
 call plug#begin('~/.vim/plugged')
 
 " General ------------------------------------------------------------------{{{
-let g:dispatch_no_maps = 1
 Plug 'tpope/vim-sensible'
-" Plug 'tpope/vim-vinegar'
 Plug 'tpope/vim-dispatch'
 Plug 'tpope/vim-fugitive'
+" Plug 'machakann/vim-sandwich'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-obsession'
@@ -21,6 +26,12 @@ Plug 't9md/vim-quickhl'
 Plug 'kana/vim-submode'
 Plug 'romainl/vim-cool'
 Plug 'scrooloose/nerdcommenter'
+Plug 'skywind3000/quickmenu.vim'
+Plug 'MattesGroeger/vim-bookmarks'
+" --------------------------------------------------------------------------}}}
+
+" Snippets -----------------------------------------------------------------{{{
+Plug 'honza/vim-snippets'
 " --------------------------------------------------------------------------}}}
 
 " Interface ----------------------------------------------------------------{{{
@@ -55,6 +66,10 @@ Plug 'morhetz/gruvbox'
 
 " Formatting ---------------------------------------------------------------{{{
 Plug 'rhysd/vim-clang-format'
+" --------------------------------------------------------------------------}}}
+
+" Python -------------------------------------------------------------------{{{
+Plug 'tell-k/vim-autopep8'
 " --------------------------------------------------------------------------}}}
 
 " LSP ----------------------------------------------------------------------{{{
@@ -95,7 +110,7 @@ let g:lightline = {
 
 function! GitVersion()
   let fullname = expand('%')
-  let gitversion = ''
+  let gitversion = FugitiveHead()
   if fullname =~? 'fugitive://.*/\.git//0/.*'
       let gitversion = 'git index'
   elseif fullname =~? 'fugitive://.*/\.git//2/.*'
@@ -160,26 +175,29 @@ nmap <leader>M <Plug>(quickhl-manual-reset)
 nmap <leader>cv :tabnew $MYVIMRC<cr>
 
 " reize splits
-call submode#enter_with('grow/shrink', 'n', '', '<leader>w+', ':res +5<cr>')
-call submode#enter_with('grow/shrink', 'n', '', '<leader>w-', ':res -5<cr>')
-call submode#enter_with('grow/shrink', 'n', '', '<leader>w>', ':vertical resize +5<cr>')
-call submode#enter_with('grow/shrink', 'n', '', '<leader>w<', ':vertical resize -5<cr>')
-call submode#map('grow/shrink', 'n', '', '+', ':res +5<cr>')
-call submode#map('grow/shrink', 'n', '', '-', ':res -5<cr>')
-call submode#map('grow/shrink', 'n', '', '>', ':vertical resize +5<cr>')
-call submode#map('grow/shrink', 'n', '', '<', ':vertical resize -5<cr>')
+call submode#enter_with('grow/shrink', 'n', '', '<leader>wk', ':res +5<cr>')
+call submode#enter_with('grow/shrink', 'n', '', '<leader>wj', ':res -5<cr>')
+call submode#enter_with('grow/shrink', 'n', '', '<leader>wl', ':vertical resize +5<cr>')
+call submode#enter_with('grow/shrink', 'n', '', '<leader>wh', ':vertical resize -5<cr>')
+call submode#map('grow/shrink', 'n', '', 'k', ':res +5<cr>')
+call submode#map('grow/shrink', 'n', '', 'j', ':res -5<cr>')
+call submode#map('grow/shrink', 'n', '', 'l', ':vertical resize +5<cr>')
+call submode#map('grow/shrink', 'n', '', 'h', ':vertical resize -5<cr>')
 
 " commenter
-let g:NERDCommenterMappings = 0
 nmap <leader>cc <plug>NERDCommenterToggle
 vmap <leader>cc <plug>NERDCommenterToggle
+
+" zoom split
+nnoremap <leader>z <c-w>_\|<c-w>\|
+nnoremap <leader>Z <c-w>=
 
 " --------------------------------------------------------------------------}}}
 
 " folding ------------------------------------------------------------------{{{
 augroup vimrc
   autocmd!
-  autocmd FileType vim setlocal foldmethod=marker
+  autocmd FileType vim setlocal foldmethod=markker
 augroup END
 " --------------------------------------------------------------------------}}}
 
@@ -196,7 +214,9 @@ nnoremap <silent> <leader>p :Files<cr>
 nnoremap <silent> <leader>o :Buffers<cr>
 nnoremap <silent> <leader>r :History:<cr>
 nnoremap <silent> <leader>rg :execute 'Rg <c-r><c-w>'<cr>
-map s <Plug>(easymotion-s)
+
+" easymotion
+nmap s <Plug>(easymotion-s)
 
 function! s:open_branch_fzf(line)
   let l:parser = split(a:line)
@@ -205,7 +225,7 @@ function! s:open_branch_fzf(line)
     let l:branch = l:parser[1]
   endif
   let l:branch = substitute(l:branch, 'remotes/origin/', '', '')
-  execute '!git checkout ' . l:branch
+  execute '!git checkkout ' . l:branch
 endfunction
 
 command! -bang -nargs=0 Gcheckout
@@ -218,7 +238,7 @@ command! -bang -nargs=0 Gcheckout
   \ )
 " --------------------------------------------------------------------------}}}
 
-" LSP ----------------------------------------------------------------------{{{
+" CoC & LSP ----------------------------------------------------------------{{{
 inoremap <silent><expr> <TAB>
       \ pumvisible() ? coc#_select_confirm() :
       \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
@@ -266,6 +286,15 @@ augroup coc
     autocmd CursorHold * silent call CocActionAsync('highlight')
     autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
+
+" edit snippets
+nnoremap <leader>es :call <SID>edit_snippets()<cr>
+
+function! s:edit_snippets()
+    execute "vsplit"
+    execute "CocCommand snippets.editSnippets"
+endfunction
+
 
 " --------------------------------------------------------------------------}}}
 
