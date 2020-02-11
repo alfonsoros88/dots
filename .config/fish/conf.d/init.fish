@@ -81,3 +81,15 @@ function cdb --description "generate compile database and bazel targets"
 end
 
 set -xg RTI_LICENSE_FILE $HOME/rti_license/rti_license.dat
+
+function lgdb --description "debug target locally"
+    bz run --script_path=foo.sh -c dbg $argv[1]
+
+    set -l runfiles_dir (rg 'RUNFILES_DIR=([^\s]+)' foo.sh -r '$1' -o -N)
+    set -l runfile (string replace ':' '/' (string replace -r '^//?' '' $argv[1]))
+
+    pushd $runfiles_dir/werkstatt
+    gdb -x 'directory ~/werkstatt' --args $runfile $argv[2..-1]
+    popd
+    rm foo.sh
+end

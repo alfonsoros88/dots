@@ -1,7 +1,68 @@
 " Disable mappings ---------------------------------------------------------{{{
 let g:dispatch_no_maps = 1
-let g:NERDCommenterMappings = 0
 let g:bookmark_no_default_key_mappings = 1
+let g:ranger_map_keys = 0
+let g:nvimgdb_disable_start_keymaps = 0
+" --------------------------------------------------------------------------}}}
+
+" Gbrowse for Bitbucket ----------------------------------------------------{{{
+
+function! s:function(name) abort
+  return function(substitute(a:name,'^s:',matchstr(expand('<sfile>'), '<SNR>\d\+_'),''))
+endfunction
+
+function! s:bitbucket_url(opts, ...) abort
+  if a:0 || type(a:opts) != type({})
+    return ''
+  endif
+
+  let domain = "atlassian.aid-driving.eu/bitbucket"
+  let domain_pattern = escape(domain, ".")
+ 
+  let repo = matchstr(a:opts.remote,'^\%(https\=://\|git://\|\(ssh://\)\=git@\)\%(.\{-\}@\)\=\zs\('.domain_pattern.'\)[/:].\{-\}\ze\%(\.git\)\=$')
+  if repo ==# ''
+    return ''
+  endif
+
+  let url_split = split(repo,'/')
+  echo url_split
+
+  let root = 'https://'. domain .'/projects/'.toupper(url_split[-2]).'/repos/'.url_split[-1]
+
+  let path = substitute(a:opts.path, '^/', '', '')
+  if path =~# '^\.git/refs/heads/'
+    return root . '/commits/'.path[16:-1]
+  elseif path =~# '^\.git/refs/tags/'
+    return root . '/browse/'.path[15:-1]
+  elseif path =~# '.git/\%(config$\|hooks\>\)'
+    return root . '/admin'
+  elseif path =~# '^\.git\>'
+    return root
+  endif
+  if a:opts.commit =~# '^\d\=$'
+    let commit = a:opts.repo.rev_parse('HEAD')
+  else
+    let commit = a:opts.commit
+  endif
+
+  if get(a:opts, 'type', '') ==# 'tree' || a:opts.path =~# '/$'
+    return ''
+  elseif get(a:opts, 'type', '') ==# 'blob' || a:opts.path =~# '[^/]$'
+    let url = root . '/browse/'.path.'?at='. substitute(commit, '/', '%2F', '')
+    if get(a:opts, 'line1')
+      let url .= '#' . a:opts.line1
+      if get(a:opts, 'line2') != get(a:opts, 'line1')
+        let url .= '-' . a:opts.line2
+      endif
+    endif
+  else
+    let url = root . '/commits/' . commit
+  endif
+  return url
+endfunction
+
+let g:fugitive_browse_handlers = [s:function('s:bitbucket_url')]
+
 " --------------------------------------------------------------------------}}}
 
 " Plug ---------------------------------------------------------------------{{{
@@ -11,6 +72,7 @@ call plug#begin('~/.vim/plugged')
 Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-dispatch'
 Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-commentary'
 " Plug 'machakann/vim-sandwich'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
@@ -18,16 +80,19 @@ Plug 'tpope/vim-obsession'
 Plug 'tpope/vim-eunuch'
 Plug 'easymotion/vim-easymotion'
 Plug 'romainl/vim-qf'
-Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh \| UpdateRemotePlugins' }
 Plug 'scrooloose/nerdtree'
 Plug 'chrisbra/NrrwRgn'
 Plug 'francoiscabrol/ranger.vim'
 Plug 't9md/vim-quickhl'
 Plug 'kana/vim-submode'
 Plug 'romainl/vim-cool'
-Plug 'scrooloose/nerdcommenter'
 Plug 'skywind3000/quickmenu.vim'
 Plug 'MattesGroeger/vim-bookmarks'
+" --------------------------------------------------------------------------}}}
+
+" Debugging ----------------------------------------------------------------{{{
+Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh \| UpdateRemotePlugins' }
+" Plug 'puremourning/vimspector'
 " --------------------------------------------------------------------------}}}
 
 " Snippets -----------------------------------------------------------------{{{
@@ -137,6 +202,10 @@ set splitright
 set number
 set termguicolors
 set shell=/bin/bash
+set relativenumber
+set inccommand=split
+set scrolloff=5
+set matchpairs+=<:>
 
 " avoid jump when using *
 noremap * m`:keepjumps normal! *``<cr>
@@ -146,7 +215,6 @@ let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 noremap <silent><expr> <leader>f &ft=="nerdtree" ? ":NERDTreeClose<cr>" : ":NERDTreeFind<cr>"
 
-let g:ranger_map_keys = 0
 "noremap <silent><expr> <leader>w ":Ranger<cr>"
 
 let g:netrw_banner = 0
@@ -159,16 +227,8 @@ let g:nrrw_rgn_nomap_nr = 1
 vnoremap <silent><expr> <leader>nr ":NR!<cr>"
 vnoremap <silent><expr> <leader>nw ":NW<cr>"
 
-augroup cppsrc
-    autocmd!
-    autocmd FileType cpp setlocal foldmethod=indent |
-                       \ setlocal foldnestmax=10 |
-                       \ setlocal nofoldenable |
-                       \ setlocal foldlevel=2
-augroup END
-
 " multiple highlights
-nmap <leader>m <Plug>(quickhl-manual-this)
+nmap <leader>m <Plug>(quickhl-manual-this-whole-word)
 nmap <leader>M <Plug>(quickhl-manual-reset)
 
 " configure vi
@@ -184,10 +244,6 @@ call submode#map('grow/shrink', 'n', '', 'j', ':res -5<cr>')
 call submode#map('grow/shrink', 'n', '', 'l', ':vertical resize +5<cr>')
 call submode#map('grow/shrink', 'n', '', 'h', ':vertical resize -5<cr>')
 
-" commenter
-nmap <leader>cc <plug>NERDCommenterToggle
-vmap <leader>cc <plug>NERDCommenterToggle
-
 " zoom split
 nnoremap <leader>z <c-w>_\|<c-w>\|
 nnoremap <leader>Z <c-w>=
@@ -197,7 +253,15 @@ nnoremap <leader>Z <c-w>=
 " folding ------------------------------------------------------------------{{{
 augroup vimrc
   autocmd!
-  autocmd FileType vim setlocal foldmethod=markker
+  autocmd FileType vim setlocal foldmethod=marker
+augroup END
+
+augroup cppsrc
+    autocmd!
+    autocmd FileType cpp setlocal foldmethod=indent |
+                       \ setlocal foldnestmax=10 |
+                       \ setlocal nofoldenable |
+                       \ setlocal foldlevel=2
 augroup END
 " --------------------------------------------------------------------------}}}
 
@@ -253,23 +317,14 @@ endfunction
 let g:coc_snippet_next = '<tab>'
 let g:coc_snippet_prev = '<s-tab>'
 
-let g:vista_fzf_preview = ['right:50%']
-let g:vista_executive_for = {
-    \ 'cpp': 'coc',
-    \ }
-let g:vista_sidebar_width = 90
-
 nmap <leader>sd <Plug>(coc-definition)
 nmap <leader>sf <Plug>(coc-declaration)
 nmap <leader>st <Plug>(coc-type-definition)
 nmap <leader>si <Plug>(coc-implementation)
 nmap <leader>sr <Plug>(coc-rename)
 nmap <leader>sc <Plug>(coc-references)
-
 nnoremap <leader>ss :CocList --interactive symbols<cr>
-nnoremap <leader>so :Vista!!<cr>
-nnoremap <leader>sv :Vista finder coc<cr>
-nnoremap <silent> <leader>sh :call <SID>show_documentation()<cr>
+nnoremap <leader>sh :call <SID>show_documentation()<cr>
 
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
@@ -295,6 +350,19 @@ function! s:edit_snippets()
     execute "CocCommand snippets.editSnippets"
 endfunction
 
+
+" --------------------------------------------------------------------------}}}
+
+" Vista --------------------------------------------------------------------{{{
+let g:vista_fzf_preview = ['right:50%']
+let g:vista_sidebar_width = 90
+
+
+nnoremap <leader>vv :Vista<cr>
+nnoremap <leader>vs :Vista show<cr>
+nnoremap <leader>vf :Vista finder<cr>
+
+"autocmd FileType vista,vista_kind nnoremap <buffer> <silent> / :<c-u>call vista#finder#fzf#Run()<CR>
 
 " --------------------------------------------------------------------------}}}
 
@@ -325,13 +393,13 @@ endfunction
 
 function! DispatchBazelBuild(...)
     if (a:0 > 0)
-        let l:bazel_target = a:1
+        let l:bazel_target = join(a:000, ' ')
     else
         let l:bazel_fullname = trim(system(g:bazel_command . ' query --noshow_progress ' . expand('%')))
         let l:bazel_package = substitute(l:bazel_fullname, ":.*", "", "")
         let l:bazel_target = trim(system(g:bazel_command . ' query --noshow_progress "attr(srcs, ' . l:bazel_fullname . ', ' . l:bazel_package . ':*)"'))
     endif
-    let l:dispatch_command = "Dispatch -compiler=gcc " . g:bazel_command . " build --color=no -- " . l:bazel_target
+    let l:dispatch_command = "Dispatch -compiler=gcc " . g:bazel_command . " build --color=no " . l:bazel_target
     call setreg("t", l:bazel_target)
     call histadd("cmd", l:dispatch_command)
     silent exec l:dispatch_command
@@ -389,6 +457,36 @@ function! LaunchGdb()
     exec "GdbStart " . l:gdb_command
 endfunction
 
-nnoremap <leader>dd :call LaunchGdb()<cr>
+" --------------------------------------------------------------------------}}}
 
+" Nvim-gdb -----------------------------------------------------------------{{{
+
+function! StartBazelDebugRaw(...)
+    silent execute "!" . g:bazel_command . " run --script_path=foo.sh --color=no " . a:1
+    let l:runfiles_dir = system("rg \'RUNFILES_DIR=([^\\s]+)\' foo.sh -r \'$1\' -o -N")
+    echo l:runfiles_dir
+endfunction
+
+command! -nargs=1 -complete=customlist,BazelCompletionListWrapper BazelDebugRaw call StartBazelDebugRaw(<f-args>)
+
+nnoremap <expr> <leader>dd ':BazelDebugRaw ' . getreg("t")
+
+function! NvimGdbNoTKeymaps()
+  tnoremap <silent> <buffer> <esc> <c-\><c-n>
+endfunction
+
+let g:nvimgdb_config_override = {
+  \ 'key_next': 'n',
+  \ 'key_step': 's',
+  \ 'key_finish': 'f',
+  \ 'key_continue': 'c',
+  \ 'key_until': 'u',
+  \ 'key_breakpoint': 'b',
+  \ 'set_tkeymaps': "NvimGdbNoTKeymaps",
+  \ }
+
+" --------------------------------------------------------------------------}}}
+
+" Vimspector ---------------------------------------------------------------{{{
+let g:vimspector_enable_mappings = 'HUMAN'
 " --------------------------------------------------------------------------}}}
