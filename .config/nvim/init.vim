@@ -90,6 +90,12 @@ Plug 'skywind3000/quickmenu.vim'
 Plug 'MattesGroeger/vim-bookmarks'
 " --------------------------------------------------------------------------}}}
 
+" General ------------------------------------------------------------------{{{
+Plug 'kana/vim-textobj-user'
+" Plug 'kana/vim-textobj-function'
+Plug 'sgur/vim-textobj-parameter'
+" --------------------------------------------------------------------------}}}
+
 " Debugging ----------------------------------------------------------------{{{
 Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh \| UpdateRemotePlugins' }
 " Plug 'puremourning/vimspector'
@@ -289,7 +295,7 @@ function! s:open_branch_fzf(line)
     let l:branch = l:parser[1]
   endif
   let l:branch = substitute(l:branch, 'remotes/origin/', '', '')
-  execute '!git checkkout ' . l:branch
+  execute '!git checkout ' . l:branch
 endfunction
 
 command! -bang -nargs=0 Gcheckout
@@ -303,6 +309,7 @@ command! -bang -nargs=0 Gcheckout
 " --------------------------------------------------------------------------}}}
 
 " CoC & LSP ----------------------------------------------------------------{{{
+
 inoremap <silent><expr> <TAB>
       \ pumvisible() ? coc#_select_confirm() :
       \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
@@ -350,6 +357,33 @@ function! s:edit_snippets()
     execute "CocCommand snippets.editSnippets"
 endfunction
 
+function! CurrentQualifiedType()
+endfunction
+
+call textobj#user#plugin('cpp', {
+\   'type': {
+\     'pattern': '[<>_a-zA-Z:]\+',
+\     'select': ['at', 'it'],
+\   },
+\   'qualifiedType': {
+\     'pattern': '\(const \)\?[<>_a-zA-Z:]\+&\?&\?',
+\     'select': ['aT', 'iT'],
+\   },
+\ })
+
+" augroup cpp_textobjs
+"   autocmd!
+"   autocmd FileType cpp call textobj#user#map('cpp', {
+"   \   'type': {
+"   \     'select-a': 'at',
+"   \     'select-i': 'it',
+"   \   },
+"   \   'qualifiedType': {
+"   \     'select-a': 'aT',
+"   \     'select-i': 'iT',
+"   \   },
+"   \ })
+" augroup END
 
 " --------------------------------------------------------------------------}}}
 

@@ -70,8 +70,10 @@ function __bazel_tests
 end
 complete -f -c bt -a '(__bazel_tests ".*")'
 
+set -gx FZF_DEFAULT_OPTS "--ansi --preview-window 'right:60%'"
 set -gx FZF_DEFAULT_COMMAND 'rg -i --files --ignore-vcs -g "!bazel-*"'
 set -gx FZF_CTRL_T_COMMAND $FZF_DEFAULT_COMMAND
+set -gx FZF_CTRL_T_OPTS "--preview 'bat --color=always --style=header,grid --line-range :300 {}'"
 set -gx FZF_ALT_C_COMMAND 'rg --sort-files --files --ignore-vcs -g "!bazel-*" --null 2> /dev/null | xargs -0 dirname | uniq'
 
 function cdb --description "generate compile database and bazel targets"
