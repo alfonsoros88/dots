@@ -254,6 +254,13 @@ call submode#map('grow/shrink', 'n', '', 'h', ':vertical resize -5<cr>')
 nnoremap <leader>z <c-w>_\|<c-w>\|
 nnoremap <leader>Z <c-w>=
 
+" terminal
+tnoremap <c-s> <C-\><C-N>
+tnoremap <C-h> <C-\><C-N><C-w>h
+tnoremap <C-j> <C-\><C-N><C-w>j
+tnoremap <C-k> <C-\><C-N><C-w>k
+tnoremap <C-l> <C-\><C-N><C-w>l
+
 " --------------------------------------------------------------------------}}}
 
 " folding ------------------------------------------------------------------{{{
@@ -283,7 +290,10 @@ augroup END
 nnoremap <silent> <leader>p :Files<cr>
 nnoremap <silent> <leader>o :Buffers<cr>
 nnoremap <silent> <leader>r :History:<cr>
+
+" ripgrep
 nnoremap <silent> <leader>rg :execute 'Rg <c-r><c-w>'<cr>
+vnoremap <silent> <leader>rg y:Rg <c-r>"<cr>
 
 " easymotion
 nmap s <Plug>(easymotion-s)

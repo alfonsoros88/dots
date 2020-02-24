@@ -12,6 +12,7 @@ import XMonad.Hooks.UrgencyHook
 import XMonad.Hooks.ManageDocks
 import qualified XMonad.StackSet as W
 
+
 data LibNotifyUrgencyHook = LibNotifyUrgencyHook deriving (Read, Show)
 
 instance UrgencyHook LibNotifyUrgencyHook where
@@ -57,5 +58,6 @@ main = do
         `additionalKeysP` 
         [ ("M-S-l", spawn "i3lock-fancy -p")
         , ("M-p", spawn "rofi -show run")
+        , ("M-S-p", spawn "scrot screen_%Y-%m-%d-%H-%M-%S.png -d 1")
         ]
 
