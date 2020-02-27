@@ -69,9 +69,9 @@ let g:fugitive_browse_handlers = [s:function('s:bitbucket_url')]
 call plug#begin('~/.vim/plugged')
 
 " General ------------------------------------------------------------------{{{
+
 Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-dispatch'
-Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-commentary'
 " Plug 'machakann/vim-sandwich'
 Plug 'tpope/vim-surround'
@@ -88,9 +88,15 @@ Plug 'kana/vim-submode'
 Plug 'romainl/vim-cool'
 Plug 'skywind3000/quickmenu.vim'
 Plug 'MattesGroeger/vim-bookmarks'
+Plug 'camspiers/lens.vim'
+
+" git
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+
 " --------------------------------------------------------------------------}}}
 
-" General ------------------------------------------------------------------{{{
+" Text Objects -------------------------------------------------------------{{{
 Plug 'kana/vim-textobj-user'
 " Plug 'kana/vim-textobj-function'
 Plug 'sgur/vim-textobj-parameter'
@@ -105,10 +111,13 @@ Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh \| UpdateRemotePlugins' }
 Plug 'honza/vim-snippets'
 " --------------------------------------------------------------------------}}}
 
-" Interface ----------------------------------------------------------------{{{
-Plug 'airblade/vim-gitgutter'
+" Aesthetics ---------------------------------------------------------------{{{
 Plug 'itchyny/lightline.vim'
+
+" colors
+Plug 'morhetz/gruvbox'
 " --------------------------------------------------------------------------}}}
+
 
 " FZF ----------------------------------------------------------------------{{{
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -126,21 +135,23 @@ Plug 'bazelbuild/vim-bazel'
 " --------------------------------------------------------------------------}}}
 
 " Syntax Highlight ---------------------------------------------------------{{{
+
 Plug 'GutenYe/json5.vim'
 Plug 'dag/vim-fish'
-Plug 'octol/vim-cpp-enhanced-highlight'
-" --------------------------------------------------------------------------}}}
 
-" Colorschemes -------------------------------------------------------------{{{
-Plug 'morhetz/gruvbox'
+" c++
+Plug 'octol/vim-cpp-enhanced-highlight'
+
 " --------------------------------------------------------------------------}}}
 
 " Formatting ---------------------------------------------------------------{{{
-Plug 'rhysd/vim-clang-format'
-" --------------------------------------------------------------------------}}}
 
-" Python -------------------------------------------------------------------{{{
+" c++
+Plug 'rhysd/vim-clang-format'
+
+" Python 
 Plug 'tell-k/vim-autopep8'
+
 " --------------------------------------------------------------------------}}}
 
 " LSP ----------------------------------------------------------------------{{{
@@ -156,15 +167,40 @@ Plug 'rust-lang/rust.vim'
 Plug '~/projects/neovim-bucket'
 " --------------------------------------------------------------------------}}}
 
-" Miscellaneous ------------------------------------------------------------{{{
+" Note taking --------------------------------------------------------------{{{
 Plug 'vimwiki/vimwiki'
 " --------------------------------------------------------------------------}}}
+
 call plug#end()
 " --------------------------------------------------------------------------}}}
 
 " General config -----------------------------------------------------------{{{
-set tabstop=8 softtabstop=0 expandtab shiftwidth=4 smarttab
+
 let mapleader = " "
+set tabstop=8
+set softtabstop=0
+set expandtab
+set shiftwidth=4
+set smarttab
+set ignorecase
+set smartcase
+set hidden
+set nobackup
+set nowritebackup
+set cmdheight=2
+set updatetime=300
+set shortmess+=c
+set signcolumn=yes
+set mouse=a
+set splitright
+set number
+set termguicolors
+set shell=/bin/bash
+set relativenumber
+set inccommand=split
+set scrolloff=5
+set matchpairs+=<:>
+
 
 let g:gruvbox_contrast_dark='soft'
 colorscheme gruvbox
@@ -194,25 +230,6 @@ function! GitVersion()
   return gitversion
 endfunction
 
-set ignorecase
-set smartcase
-set hidden
-set nobackup
-set nowritebackup
-set cmdheight=2
-set updatetime=300
-set shortmess+=c
-set signcolumn=yes
-set mouse=a
-set splitright
-set number
-set termguicolors
-set shell=/bin/bash
-set relativenumber
-set inccommand=split
-set scrolloff=5
-set matchpairs+=<:>
-
 " avoid jump when using *
 noremap * m`:keepjumps normal! *``<cr>
 noremap <silent><expr> <leader>g &ft=="fugitive" ? ":normal gq<cr>" : ":Gstatus<cr>"
@@ -240,6 +257,13 @@ nmap <leader>M <Plug>(quickhl-manual-reset)
 " configure vi
 nmap <leader>cv :tabnew $MYVIMRC<cr>
 
+" lens
+let g:lens#disabled_filetypes = ['nerdtree', 'fzf']
+let g:lens#height_resize_min = 30
+let g:lens#height_resize_max = 60
+let g:lens#width_resize_min = 125
+let g:lens#width_resize_max = 250
+
 " reize splits
 call submode#enter_with('grow/shrink', 'n', '', '<leader>wk', ':res +5<cr>')
 call submode#enter_with('grow/shrink', 'n', '', '<leader>wj', ':res -5<cr>')
@@ -255,7 +279,7 @@ nnoremap <leader>z <c-w>_\|<c-w>\|
 nnoremap <leader>Z <c-w>=
 
 " terminal
-tnoremap <c-s> <C-\><C-N>
+tnoremap <c-k><c-j> <C-\><C-N>
 tnoremap <C-h> <C-\><C-N><C-w>h
 tnoremap <C-j> <C-\><C-N><C-w>j
 tnoremap <C-k> <C-\><C-N><C-w>k
@@ -264,36 +288,40 @@ tnoremap <C-l> <C-\><C-N><C-w>l
 " --------------------------------------------------------------------------}}}
 
 " folding ------------------------------------------------------------------{{{
-augroup vimrc
+"
+augroup folding
   autocmd!
   autocmd FileType vim setlocal foldmethod=marker
+  autocmd FileType cpp setlocal foldmethod=indent |
+                     \ setlocal foldnestmax=10 |
+                     \ setlocal nofoldenable |
+                     \ setlocal foldlevel=2
 augroup END
 
-augroup cppsrc
-    autocmd!
-    autocmd FileType cpp setlocal foldmethod=indent |
-                       \ setlocal foldnestmax=10 |
-                       \ setlocal nofoldenable |
-                       \ setlocal foldlevel=2
-augroup END
 " --------------------------------------------------------------------------}}}
 
 " HighLight ----------------------------------------------------------------{{{
+
 augroup manifestfiles
   autocmd!
   autocmd BufRead,BufNewFile manifest*.json setlocal filetype=json5
+  autocmd BufRead,BufNewFile *.manifest setlocal filetype=json5
   autocmd BufRead,BufNewFile *.osl setlocal syntax=cpp
 augroup END
+
 " --------------------------------------------------------------------------}}}
 
 " Navigation ---------------------------------------------------------------{{{
 nnoremap <silent> <leader>p :Files<cr>
 nnoremap <silent> <leader>o :Buffers<cr>
-nnoremap <silent> <leader>r :History:<cr>
+nnoremap <silent> <leader>: :History:<cr>
 
 " ripgrep
 nnoremap <silent> <leader>rg :execute 'Rg <c-r><c-w>'<cr>
 vnoremap <silent> <leader>rg y:Rg <c-r>"<cr>
+
+nnoremap <leader>rr :<c-u>%s/<c-r><c-w>//g<left><left>
+
 
 " easymotion
 nmap s <Plug>(easymotion-s)
@@ -445,7 +473,6 @@ function! DispatchBazelBuild(...)
     endif
     let l:dispatch_command = "Dispatch -compiler=gcc " . g:bazel_command . " build --color=no " . l:bazel_target
     call setreg("t", l:bazel_target)
-    call histadd("cmd", l:dispatch_command)
     silent exec l:dispatch_command
 endfunction
 
@@ -461,13 +488,11 @@ function! DispatchBazelTest(...)
     let g:last_bazel_target = l:bazel_test
     let l:dispatch_command = "Dispatch -compiler=gcc " . g:bazel_command . " test --color=no --cache_test_results=no --test_output=all " . l:bazel_test
     call setreg("t", l:bazel_test)
-    call histadd("cmd", l:dispatch_command)
     silent exec l:dispatch_command
 endfunction
 
 function! StartBazelDebug(target)
     let l:dispatch_command = "Start /home/rosdosal/werkstatt/tools/docker/bazel_gdbserver.sh --copt=-g --copt=-O0 " . trim(a:target)
-    call histadd("cmd", l:dispatch_command)
     exec l:dispatch_command
 endfunction
 
