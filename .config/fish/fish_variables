@@ -24,6 +24,8 @@ SETUVAR _fish_abbr_gca:git\x20commit\x20\x2dv\x20\x2da
 SETUVAR _fish_abbr_gca_21_:git\x20commit\x20\x2dv\x20\x2da\x20\x2d\x2damend
 SETUVAR _fish_abbr_gcam:git\x20commit\x20\x2da\x20\x2dm
 SETUVAR _fish_abbr_gcan_21_:git\x20commit\x20\x2dv\x20\x2da\x20\x2d\x2dno\x2dedit\x20\x2d\x2damend
+SETUVAR _fish_abbr_gcav:git\x20commit\x20\x2da\x20\x2dv\x20\x2d\x2dno\x2dverify
+SETUVAR _fish_abbr_gcav_21_:git\x20commit\x20\x2da\x20\x2dv\x20\x2d\x2dno\x2dverify\x20\x2d\x2damend
 SETUVAR _fish_abbr_gcb:git\x20checkout\x20\x2db
 SETUVAR _fish_abbr_gcl:git\x20clone
 SETUVAR _fish_abbr_gcm:git\x20commit\x20\x2dm
@@ -33,6 +35,7 @@ SETUVAR _fish_abbr_gcod:git\x20checkout\x20develop
 SETUVAR _fish_abbr_gcom:git\x20checkout\x20master
 SETUVAR _fish_abbr_gcount:git\x20shortlog\x20\x2dsn
 SETUVAR _fish_abbr_gcp:git\x20cherry\x2dpick
+SETUVAR _fish_abbr_gcv:git\x20commit\x20\x2dv\x20\x2d\x2dno\x2dverify
 SETUVAR _fish_abbr_gd:git\x20diff
 SETUVAR _fish_abbr_gdca:git\x20diff\x20\x2d\x2dcached
 SETUVAR _fish_abbr_gds:git\x20diff\x20\x2d\x2dstat
@@ -63,6 +66,7 @@ SETUVAR _fish_abbr_glg:git\x20log\x20\x2d\x2dstat\x20\x2d\x2dmax\x2dcount\x3d10
 SETUVAR _fish_abbr_glgg:git\x20log\x20\x2d\x2dgraph\x20\x2d\x2dmax\x2dcount\x3d10
 SETUVAR _fish_abbr_glgga:git\x20log\x20\x2d\x2dgraph\x20\x2d\x2ddecorate\x20\x2d\x2dall
 SETUVAR _fish_abbr_glo:git\x20log\x20\x2d\x2doneline\x20\x2d\x2ddecorate\x20\x2d\x2dcolor
+SETUVAR _fish_abbr_glod:git\x20log\x20\x2d\x2doneline\x20\x2d\x2ddecorate\x20\x2d\x2dcolor\x20develop\x2e\x2e
 SETUVAR _fish_abbr_glog:git\x20log\x20\x2d\x2doneline\x20\x2d\x2ddecorate\x20\x2d\x2dcolor\x20\x2d\x2dgraph
 SETUVAR _fish_abbr_glom:git\x20log\x20\x2d\x2doneline\x20\x2d\x2ddecorate\x20\x2d\x2dcolor\x20master\x2e\x2e
 SETUVAR _fish_abbr_gloo:git\x20log\x20\x2d\x2dpretty\x3dformat\x3a\x27\x25C\x28yellow\x29\x25h\x20\x25Cred\x25ad\x20\x25Cblue\x25an\x25Cgreen\x25d\x20\x25Creset\x25s\x27\x20\x2d\x2ddate\x3dshort
@@ -77,8 +81,13 @@ SETUVAR _fish_abbr_gr:git\x20remote\x20\x2dvv
 SETUVAR _fish_abbr_grb:git\x20rebase
 SETUVAR _fish_abbr_grba:git\x20rebase\x20\x2d\x2dabort
 SETUVAR _fish_abbr_grbc:git\x20rebase\x20\x2d\x2dcontinue
+SETUVAR _fish_abbr_grbd:git\x20rebase\x20develop
+SETUVAR _fish_abbr_grbdi:git\x20rebase\x20master\x20\x2d\x2dinteractive
+SETUVAR _fish_abbr_grbdia:git\x20rebase\x20master\x20\x2d\x2dinteractive\x20\x2d\x2dautosquash
 SETUVAR _fish_abbr_grbi:git\x20rebase\x20\x2d\x2dinteractive
 SETUVAR _fish_abbr_grbm:git\x20rebase\x20master
+SETUVAR _fish_abbr_grbmi:git\x20rebase\x20master\x20\x2d\x2dinteractive
+SETUVAR _fish_abbr_grbmia:git\x20rebase\x20master\x20\x2d\x2dinteractive\x20\x2d\x2dautosquash
 SETUVAR _fish_abbr_grbs:git\x20rebase\x20\x2d\x2dskip
 SETUVAR _fish_abbr_grh:git\x20reset\x20HEAD
 SETUVAR _fish_abbr_grhh:git\x20reset\x20HEAD\x20\x2d\x2dhard
@@ -100,6 +109,8 @@ SETUVAR _fish_abbr_gstd:git\x20stash\x20drop
 SETUVAR _fish_abbr_gstp:git\x20stash\x20pop
 SETUVAR _fish_abbr_gsts:git\x20stash\x20show\x20\x2d\x2dtext
 SETUVAR _fish_abbr_gsu:git\x20submodule\x20update
+SETUVAR _fish_abbr_gsur:git\x20submodule\x20update\x20\x2d\x2drecursive
+SETUVAR _fish_abbr_gsuri:git\x20submodule\x20update\x20\x2d\x2drecursive\x20\x2d\x2dinit
 SETUVAR _fish_abbr_gsw:git\x20switch
 SETUVAR _fish_abbr_gswc:git\x20switch\x20\x2d\x2dcreate
 SETUVAR _fish_abbr_gunignore:git\x20update\x2dindex\x20\x2d\x2dno\x2dassume\x2dunchanged

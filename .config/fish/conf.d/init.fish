@@ -59,7 +59,11 @@ abbr -a -g bt bz test --cache_test_results=no
 abbr -a -g br bz run
 
 function fco --description "checkout branch"
-  git branch --all | grep -v HEAD | string trim | fzf | read -l result; and git checkout "$result"
+  set -l branch (git branch --all | grep -v HEAD | string trim | fzf)
+  set -l branch (string replace -r "^remotes/origin/" "" $branch)
+  if set -q branch
+    git checkout $branch
+  end
 end
 
 #alias k='`git rev-parse --show-toplevel 2>/dev/null`/tools/docker/killrunning.py'

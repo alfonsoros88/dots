@@ -22,7 +22,8 @@ instance UrgencyHook LibNotifyUrgencyHook where
         safeSpawn "notify-send" [show name, "workspace " ++ idx]
 
 myManageHooks = 
-    [ className =? "Microsoft Teams - Preview" --> doFloat
+    [ className =? "Microsoft Teams - Preview" --> doFloat <+> doF W.focusDown
+    , className =? "qfusion" --> doFloat <+> doF W.focusDown
     , manageDocks
     ]
 

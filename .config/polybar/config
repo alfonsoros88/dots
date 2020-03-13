@@ -39,7 +39,7 @@ secondary = #FF6200
 alert = #fb4934
 
 [bar/default]
-monitor = ${env:MONITOR:DP-4}
+monitor = ${env:MONITOR:HDMI-0}
 
 width = 140%
 height = 30
@@ -75,7 +75,7 @@ modules-left = workspaces-xmonad title-xmonad
 ; bspwm i3
 modules-center =
 ;mpd
-modules-right = filesystem xbacklight alsa pulseaudio xkeyboard memory cpu eth temperature date powermenu 
+modules-right = filesystem xbacklight pulseaudio xkeyboard memory cpu eth temperature date powermenu 
 
 tray-position = right
 tray-padding = 10

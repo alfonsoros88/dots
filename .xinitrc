@@ -6,7 +6,7 @@ PATH=$PATH:~/.cabal/bin:~/.xmonad/bin
 /usr/lib/notification-daemon/notification-daemon &
 polybar -r default &
 
-feh --bg-scale ~/Pictures/bg2.png
+feh --bg-scale ~/Pictures/bg5.jpg
 
 setxkbmap -option caps:escape &
 

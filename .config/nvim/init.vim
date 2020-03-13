@@ -89,6 +89,7 @@ Plug 'romainl/vim-cool'
 Plug 'skywind3000/quickmenu.vim'
 Plug 'MattesGroeger/vim-bookmarks'
 Plug 'camspiers/lens.vim'
+Plug 'junegunn/goyo.vim'
 
 " git
 Plug 'tpope/vim-fugitive'
@@ -238,6 +239,18 @@ let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 noremap <silent><expr> <leader>f &ft=="nerdtree" ? ":NERDTreeClose<cr>" : ":NERDTreeFind<cr>"
 
+" call NERDTreeAddKeyMap({
+"         \ 'key': 'yy',
+"         \ 'callback': 'NERDTreeYankCurrentNode',
+"         \ 'quickhelpText': 'put full path of current node into the default register' })
+" 
+" function! NERDTreeYankCurrentNode()
+"     let n = g:NERDTreeFileNode.GetSelected()
+"     if n != {}
+"         call setreg('"', n.path.str())
+"     endif
+" endfunction
+
 "noremap <silent><expr> <leader>w ":Ranger<cr>"
 
 let g:netrw_banner = 0
@@ -258,7 +271,7 @@ nmap <leader>M <Plug>(quickhl-manual-reset)
 nmap <leader>cv :tabnew $MYVIMRC<cr>
 
 " lens
-let g:lens#disabled_filetypes = ['nerdtree', 'fzf']
+let g:lens#disabled_filetypes = ['nerdtree', 'fzf', 'qf']
 let g:lens#height_resize_min = 30
 let g:lens#height_resize_max = 60
 let g:lens#width_resize_min = 125
@@ -317,8 +330,21 @@ nnoremap <silent> <leader>o :Buffers<cr>
 nnoremap <silent> <leader>: :History:<cr>
 
 " ripgrep
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
+  \   fzf#vim#with_preview(), <bang>0)
+
+command! -bang -nargs=* Rgl
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>) . ' ' . expand("%:p:h"), 1,
+  \   fzf#vim#with_preview(), <bang>0)
+
 nnoremap <silent> <leader>rg :execute 'Rg <c-r><c-w>'<cr>
 vnoremap <silent> <leader>rg y:Rg <c-r>"<cr>
+
+nnoremap <silent> <leader>rl :execute 'Rgl <c-r><c-w>'<cr>
+vnoremap <silent> <leader>rl y:Rgl <c-r>"<cr>
 
 nnoremap <leader>rr :<c-u>%s/<c-r><c-w>//g<left><left>
 
@@ -397,6 +423,19 @@ endfunction
 
 function! CurrentQualifiedType()
 endfunction
+
+" Introduce function text object
+" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
+xmap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
+omap if <Plug>(coc-funcobj-i)
+omap af <Plug>(coc-funcobj-a)
+
+" Use <TAB> for selections ranges.
+" NOTE: Requires 'textDocument/selectionRange' support from the language server.
+" coc-tsserver, coc-python are the examples of servers that support it.
+nmap <silent> <TAB> <Plug>(coc-range-select)
+xmap <silent> <TAB> <Plug>(coc-range-select)
 
 call textobj#user#plugin('cpp', {
 \   'type': {
