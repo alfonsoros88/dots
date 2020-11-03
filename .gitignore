@@ -7,3 +7,4 @@
 !.config/polybar
 !.local/share/fonts
 !setup
+!.tmux.conf

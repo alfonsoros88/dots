@@ -1,13 +1,9 @@
-#!/usr/bin/env bash
-xrdb -merge ~/.Xresources
+#!/bin/bash
 
-PATH=$PATH:~/.cabal/bin:~/.xmonad/bin
+test -f "$HOME/.profile" && . "$HOME/.profile"
 
-/usr/lib/notification-daemon/notification-daemon &
-polybar -r default &
+rofi &
+polybar -r main &
+feh --bg-scale ~/Pictures/wp/wp1.jpg &
 
-feh --bg-scale ~/Pictures/bg5.jpg
-
-setxkbmap -option caps:escape &
-
-exec ~/.cabal/bin/xmonad
+exec xmonad
