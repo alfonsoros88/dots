@@ -5,4 +5,7 @@ let g:vimwiki_list = [{'path': '~/vimwiki/',
 
 let g:vimwiki_global_ext = 0
 
-let g:vimwiki_folding = 'custom'
+" let g:vimwiki_folding = 'custom'
+
+" vimwiki overrides coc tab completion
+au filetype vimwiki silent! iunmap <buffer> <Tab>

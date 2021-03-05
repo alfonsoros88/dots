@@ -1,9 +1,21 @@
+" replaces nerdtree
 noremap <leader>n :CocCommand explorer<cr>
+
 nmap <leader>sd <Plug>(coc-definition)
 nmap <leader>sx <Plug>(coc-declaration)
 nmap <leader>sc <Plug>(coc-references)
 nmap <leader>sr <Plug>(coc-rename)
+nmap <leader>st <Plug>(coc-type-definition)
 
+" code action
+nmap <silent> <leader>sa <Plug>(coc-codeaction)
+nmap <silent> <leader>ca <Plug>(coc-codeaction-cursor)
+
+" range select
+nmap <silent> <leader>rs <Plug>(coc-range-select)
+xmap <silent> <leader>rs <Plug>(coc-range-select)
+
+nnoremap <leader>cr :CocRestart<cr>
 
 nmap [w <Plug>(coc-diagnostic-prev)
 nmap ]w <Plug>(coc-diagnostic-next)
@@ -14,6 +26,9 @@ inoremap <silent><expr> <TAB>
       \ <SID>check_back_space() ? "\<TAB>" :
       \ coc#refresh()
 
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
 function! s:check_back_space() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
@@ -21,7 +36,6 @@ endfunction
 
 let g:coc_snippet_next = '<c-n>'
 let g:coc_snippet_prev = '<c-p>'
-
 
 " function text object
 xmap if <Plug>(coc-funcobj-i)
@@ -40,15 +54,6 @@ nnoremap <silent><nowait> <leader>ss  :<C-u>CocList -I symbols<cr>
 " show documentation
 nnoremap <silent> <leader>sh :call <SID>show_documentation()<CR>
 
-" function! s:show_documentation()
-"   if (index(['vim','help'], &filetype) >= 0)
-"     execute 'h '.expand('<cword>')
-"   else
-"     call CocActionAsync('doHover')
-"   endif
-" endfunction
-
-
 " Use K to show documentation in preview window.
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
@@ -61,3 +66,10 @@ function! s:show_documentation()
     execute '!' . &keywordprg . " " . expand('<cword>')
   endif
 endfunction
+
+" Use c-j and c-k in dropdowns to navigate too std
+inoremap <silent><expr> <c-j> pumvisible() ? "\<c-n>"
+                              \: "\<esc>:TmuxNavigateDown\<CR>"
+inoremap <silent><expr> <c-k> pumvisible() ? "\<c-p>"
+                              \: "\<esc>:TmuxNavigateUp\<CR>"
+

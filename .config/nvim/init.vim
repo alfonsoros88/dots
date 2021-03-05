@@ -1,6 +1,7 @@
-source $HOME/.config/nvim/plug.vim
 source $HOME/.config/nvim/general.vim
+source $HOME/.config/nvim/plug.vim
 
+colorscheme gruvbox
 nnoremap <leader>cv :call EditVimConfig()<cr>
 
 function! EditVimConfig() abort
@@ -8,3 +9,7 @@ function! EditVimConfig() abort
     lcd %:p:h
     setlocal path=.,**,,
 endfunction
+
+" TODO find a better place to put this
+let g:AutoPairs['<']='>'
+

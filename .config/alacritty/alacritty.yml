@@ -1,15 +1,9 @@
 # Font configuration (changes require restart)
 font:
   # The size to use.
-  size: 9
+  size: 11
   # The normal (roman) font face to use.
-  normal:
-    family: FiraCode Nerd Font Mono
-    style: Regular
-
-  bold:
-    family: FiraCode Nerd Font Mono
-    style: Bold
+  family: FiraCode Nerd Font Mono
 
 # Colors (Gruvbox dark)
 colors:

@@ -15,6 +15,8 @@ Plug 'easymotion/vim-easymotion'
 Plug 'wellle/targets.vim'
 Plug 'machakann/vim-sandwich'
 Plug 'jiangmiao/auto-pairs'
+Plug 'AndrewRadev/splitjoin.vim'
+" Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 " tmux
 Plug 'christoomey/vim-tmux-navigator'
@@ -31,7 +33,6 @@ Plug 'haya14busa/incsearch-easymotion.vim'
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
 Plug 'vimwiki/vimwiki'
-Plug 'masukomi/vim-markdown-folding'
 
 " rust
 Plug 'rust-lang/rust.vim'
@@ -59,6 +60,4 @@ Plug 'liuchengxu/vista.vim'
 
 " C++
 Plug 'rhysd/vim-clang-format'
-
 call plug#end()
-

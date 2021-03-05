@@ -1,1 +1,1 @@
-/home/rosdosal/.local/share/omf/themes/spacefish/fish_prompt.fish
+/home/alfonsoros/.local/share/omf/themes/spacefish/fish_prompt.fish

@@ -41,6 +41,7 @@ set wrap linebreak nolist
 set noautochdir
 
 " search
+set smartcase
 set ignorecase
 
 " leader key
@@ -52,7 +53,6 @@ set scrolloff=8
 if (has("termguicolors"))
   set termguicolors
 endif
-colorscheme gruvbox
 
 " automatic remove trailing white spaces
 augroup ALLTHEFILES
@@ -60,3 +60,15 @@ augroup ALLTHEFILES
     autocmd BufWritePre * %s/\s\+$//e
 augroup END
 
+" previews the search and replacement result
+set inccommand=split
+
+nnoremap <leader>rr :%s/<c-r><c-w>//g<left><left>
+vnoremap <leader>rr y:%s/<c-r>"//g<left><left>
+
+" color the 80th column
+" let &colorcolumn="80,".join(range(120,999),",")
+" let &colorcolumn="80"
+
+" gitgutter
+set updatetime=100
